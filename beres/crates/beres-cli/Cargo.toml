@@ -1,0 +1,15 @@
+[package]
+name = "beres-cli"
+version = "0.1.0"
+edition = "2021"
+description = "Thin CLI over beres-core for testing and CI only."
+license = "MIT"
+
+[[bin]]
+name = "beres"
+path = "src/main.rs"
+
+[dependencies]
+beres-core = { path = "../beres-core" }
+anyhow = "1"
+serde_json = "1"

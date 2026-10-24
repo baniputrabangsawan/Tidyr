@@ -1,0 +1,15 @@
+[workspace]
+members = [
+  "crates/beres-core",
+  "crates/beres-cli",
+  "src-tauri",
+]
+resolver = "2"
+
+# Small binaries: optimize for size in release builds.
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
