@@ -471,4 +471,5 @@ pub fn run() {
             save_settings,
         ])
         .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }

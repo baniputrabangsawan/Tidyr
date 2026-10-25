@@ -204,16 +204,7 @@ fn file_id_of(meta: &std::fs::Metadata) -> Option<String> {
     Some(format!("{}:{}", meta.dev(), meta.ino()))
 }
 
-#[cfg(windows)]
-fn file_id_of(meta: &std::fs::Metadata) -> Option<String> {
-    use std::os::windows::fs::MetadataExt;
-    match (meta.volume_serial_number(), meta.file_index()) {
-        (Some(vol), Some(idx)) => Some(format!("{vol}:{idx}")),
-        _ => None,
-    }
-}
-
-#[cfg(all(not(unix), not(windows)))]
+#[cfg(not(unix))]
 fn file_id_of(_meta: &std::fs::Metadata) -> Option<String> {
     None
 }

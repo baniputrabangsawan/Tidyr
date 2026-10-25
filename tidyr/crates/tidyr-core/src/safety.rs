@@ -96,9 +96,10 @@ fn protected_prefixes() -> Vec<PathBuf> {
 /// These live under system parent paths on some OSes (e.g. macOS tempdirs are symlinked
 /// under /private/var/folders) but are legitimate scratch spaces, provided they are strictly
 /// inside the temporary folder rather than the system root itself.
-fn is_allowed_temp_workspace(path: &Path) -> bool {
+fn is_allowed_temp_workspace(_path: &Path) -> bool {
     #[cfg(not(windows))]
     {
+        let path = _path;
         let allowed = [
             "/tmp",
             "/private/tmp",
