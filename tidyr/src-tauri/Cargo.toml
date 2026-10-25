@@ -1,0 +1,29 @@
+[package]
+name = "tidyr"
+version = "0.1.0"
+edition = "2021"
+description = "Tidyr desktop app (Tauri shell; thin glue over tidyr-core)."
+license = "MIT"
+
+[lib]
+name = "tidyr_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[dependencies]
+tidyr-core = { path = "../crates/tidyr-core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-updater = "2"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
+anyhow = "1"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }

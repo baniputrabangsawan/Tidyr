@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-
+  workflow_dispatch:
 env:
   CARGO_TERM_COLOR: always
 
@@ -23,24 +23,31 @@ jobs:
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
       - name: fmt
-        run: cargo fmt -p beres-core -p beres-cli -- --check
-        working-directory: beres
+        run: cargo fmt --all -- --check
+        working-directory: tidyr
       - name: clippy
-        run: cargo clippy -p beres-core -p beres-cli --all-targets -- -D warnings
-        working-directory: beres
+        run: cargo clippy -p tidyr-core -p tidyr-cli --all-targets -- -D warnings
+        working-directory: tidyr
       - name: test
-        run: cargo test -p beres-core -p beres-cli
-        working-directory: beres
+        run: cargo test -p tidyr-core -p tidyr-cli
+        working-directory: tidyr
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tidyr/ui/package-lock.json
+      - name: build ui for tauri
+        run: npm ci && npm run build
+        working-directory: tidyr/ui
       # src-tauri needs OS webviews; check it compiles where possible.
       - name: system deps (linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libdbus-1-dev pkg-config
       - name: check src-tauri
-        run: cargo check -p beres
-        working-directory: beres
-
+        run: cargo check -p tidyr
+        working-directory: tidyr
   ui:
     name: ui
     runs-on: ubuntu-latest
@@ -50,10 +57,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: beres/ui/package-lock.json
+          cache-dependency-path: tidyr/ui/package-lock.json
       - run: npm ci
-        working-directory: beres/ui
+        working-directory: tidyr/ui
       - run: npm run check
-        working-directory: beres/ui
+        working-directory: tidyr/ui
       - run: npm run build
-        working-directory: beres/ui
+        working-directory: tidyr/ui

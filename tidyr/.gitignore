@@ -1,0 +1,12 @@
+/target/
+**/target/
+**/dist/
+ui/node_modules/
+ui/.svelte-kit/
+src-tauri/target/
+*.log
+*.key
+*.pem
+*.db
+.DS_Store
+Thumbs.db

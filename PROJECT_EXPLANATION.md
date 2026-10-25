@@ -1,8 +1,8 @@
-# Project Explanation: Beres (Tidyr)
+# Project Explanation: Tidyr
 
 ## 1. Overview & Mission
 
-**Beres** (package identifier `id.beres.app`, published under repository `Tidyr`) is a lightweight, safe, 100% local desktop application built with **Rust (Tauri v2)** and **Svelte 5**. It helps non-technical users tidy up chaotic directories (such as `Downloads`, `Desktop`, `Pictures`, and WhatsApp media) and safely resolve duplicate files without any risk of data loss.
+**Tidyr** (package identifier `id.tidyr.app`, published under repository `Tidyr`, originally conceived as *Beres*) is a lightweight, safe, 100% local desktop application built with **Rust (Tauri v2)** and **Svelte 5**. It helps non-technical users tidy up chaotic directories (such as `Downloads`, `Desktop`, `Pictures`, and WhatsApp media) and safely resolve duplicate files without any risk of data loss.
 
 ### The Problem
 * **Unchecked Clutter**: Folders like `Downloads` accumulate mixed media, installers, documents, and nested subfolders over months or years.
@@ -29,13 +29,13 @@ clean-storage/
 ├── README.md                   # Quickstart and overview
 ├── PROJECT_EXPLANATION.md      # In-depth architectural and technical explanation
 ├── .gitignore                  # Git exclusions (Rust target, Node dist, OS artifacts)
-└── beres/
+└── tidyr/
     ├── Cargo.toml              # Workspace root (resolver="2", size-optimized release profile)
     ├── docs/
     │   └── SAFETY.md           # Formal specification of safety invariants & test mappings
     ├── crates/
-    │   ├── beres-core/         # Pure Rust domain logic (zero UI/Tauri dependencies)
-    │   └── beres-cli/          # Headless CLI wrapper for testing, CI, and scripting
+    │   ├── tidyr-core/         # Pure Rust domain logic (zero UI/Tauri dependencies)
+    │   └── tidyr-cli/          # Headless CLI wrapper for testing, CI, and scripting
     ├── src-tauri/              # Tauri v2 backend glue, commands, and native window hooks
     └── ui/                     # Svelte 5 + Vite 6 + TypeScript desktop UI
 ```
@@ -56,9 +56,9 @@ clean-storage/
 
 ---
 
-## 4. The Core Engine Pipeline (`beres-core`)
+## 4. The Core Engine Pipeline (`tidyr-core`)
 
-All core business logic is housed in `crates/beres-core` with no Tauri or GUI dependencies. Operations follow a strict sequential pipeline:
+All core business logic is housed in `crates/tidyr-core` with no Tauri or GUI dependencies. Operations follow a strict sequential pipeline:
 
 ```text
 [Target Directory]
@@ -93,7 +93,7 @@ Before performing any read or write, candidate paths are normalized and canonica
 * System directories: `C:\Windows`, `Program Files`, `ProgramData`, `/`, `/bin`, `/boot`, `/dev`, `/etc`, `/lib`, `/proc`, `/root`, `/sys`, `/usr`, `/var`.
 * User profile roots (`$HOME` or `C:\Users\<Name>`), preventing users from accidentally selecting and reorganizing their whole profile.
 * Drive roots (`C:\`, `D:\`, `/`).
-* Beres's own app data directory (`$APP_DATA/id.beres.app`).
+* Tidyr's own app data directory (`$APP_DATA/id.tidyr.app`).
 
 ### 4.2 Non-Destructive Scanning (`scan.rs`)
 * Recursively traverses target folders using `walkdir::WalkDir`.
@@ -113,7 +113,7 @@ Before performing any read or write, candidate paths are normalized and canonica
 * **Screenshot Detection**: Detects screenshot naming conventions (`Screenshot_*`, `Tangkapan layar_*`, `Screen Shot *`) and routes them directly to `Gambar/Screenshot`.
 
 ### 4.4 Staged Duplicate Detection (`dedupe.rs`)
-To avoid computing hashes across thousands of files unnecessarily, Beres employs a 4-stage filter:
+To avoid computing hashes across thousands of files unnecessarily, Tidyr employs a 4-stage filter:
 1. **Size Partitioning**: Groups files by exact byte size. Files with unique sizes are skipped immediately with zero read I/O.
 2. **Partial Hashing**: Reads the first 64 KB (`PARTIAL_LEN`). For files $> 1\text{ MB}$, it also reads and folds in the last 64 KB.
 3. **Full Parallel BLAKE3**: Files matching partial hashes are hashed completely using multi-threaded BLAKE3 via `rayon`.
@@ -121,7 +121,7 @@ To avoid computing hashes across thousands of files unnecessarily, Beres employs
 5. **Hardlink Awareness**: Hardlinked files sharing the same inode are flagged (`is_hardlink_set`) and excluded from reclaimable space metrics.
 
 ### 4.5 Duplicate "Keeper" Selection (`keeper.rs`)
-For each duplicate cluster, Beres selects exactly one file to **keep** using an automated weighted scoring system:
+For each duplicate cluster, Tidyr selects exactly one file to **keep** using an automated weighted scoring system:
 * **Organized Folder Bonus (+100)**: Prioritizes files in clean, structured directories over messy folders (`downloads`, `unduhan`, `desktop`, `temp`, `sampah`, `whatsapp`).
 * **Clean Name Bonus (+20) vs. Copy Penalty (-50)**: Penalizes copy markers like `(1)`, `(2)`, `copy`, `salinan`, `- Copy`.
 * **Age Bonus (+1 per day older)**: Original files are typically older than duplicates.
@@ -177,10 +177,10 @@ $APP_DATA/quarantine/
 
 ## 7. Local File Storage Layout
 
-All persistent metadata is stored locally within the OS application data directory (`~/.local/share/id.beres.app/` on Linux, `%APPDATA%\id.beres.app\` on Windows):
+All persistent metadata is stored locally within the OS application data directory (`~/.local/share/id.tidyr.app/` on Linux, `%APPDATA%\id.tidyr.app\` on Windows):
 
 ```text
-id.beres.app/
+id.tidyr.app/
 ├── settings.json         # User settings (theme, retention_days, organize_mode)
 ├── cache.db              # SQLite hash cache (size, mtime, blake3)
 ├── journal.db            # SQLite write-ahead undo journal
@@ -195,46 +195,47 @@ id.beres.app/
 
 ### 8.1 Automated Test Suites
 ```sh
-cd beres
+cd tidyr
 
-# Run all core tests (45 unit, acceptance, and property tests)
-cargo test -p beres-core
+# Run all core tests (52 unit, acceptance, and property tests)
+cargo test -p tidyr-core
 
 # Run CLI tests and linting
-cargo test -p beres-cli
-cargo clippy -p beres-core -p beres-cli --all-targets -- -D warnings
-cargo fmt -p beres-core -p beres-cli -- --check
+cargo test -p tidyr-cli
+cargo clippy -p tidyr-core -p tidyr-cli --all-targets -- -D warnings
+cargo fmt -p tidyr-core -p tidyr-cli -- --check
 ```
 
 ### 8.2 Headless CLI Smoke Test
 You can test the entire scan $\to$ plan $\to$ apply $\to$ undo lifecycle without launching the GUI:
 ```sh
 # 1. Prepare sample files
-mkdir -p /tmp/beres-demo
-echo "Document content" > /tmp/beres-demo/sample.pdf
-echo "Document content" > /tmp/beres-demo/"sample (1).pdf"
-echo "My Notes"         > /tmp/beres-demo/notes.txt
+mkdir -p /tmp/tidyr-demo
+echo "Document content" > /tmp/tidyr-demo/sample.pdf
+echo "Document content" > /tmp/tidyr-demo/"sample (1).pdf"
+echo "My Notes"         > /tmp/tidyr-demo/notes.txt
 
 # 2. Build the CLI
-cd beres
-cargo build -p beres-cli
+cd tidyr
+cargo build -p tidyr-cli
 
 # 3. Scan (Dry-Run)
-export BERES_APP_DATA=/tmp/beres-data
-./target/debug/beres scan /tmp/beres-demo
+export TIDYR_APP_DATA=/tmp/tidyr-data
+./target/debug/tidyr scan /tmp/tidyr-demo
 
 # 4. Apply the plan
-./target/debug/beres apply /tmp/beres-data/last-plan.json
+./target/debug/tidyr apply /tmp/tidyr-data/last-plan.json
 
 # 5. Inspect quarantine and undo
-./target/debug/beres quarantine list
-./target/debug/beres sessions
-./target/debug/beres undo <SESSION_ID>
+./target/debug/tidyr quarantine list
+./target/debug/tidyr sessions
+./target/debug/tidyr undo <SESSION_ID>
+
 ```
 
 ### 8.3 Frontend Type-Checking & Build
 ```sh
-cd beres/ui
+cd tidyr/ui
 npm ci
 npm run check
 npm run build
@@ -242,7 +243,7 @@ npm run build
 
 ### 8.4 Running Desktop App in Development
 ```sh
-cd beres
+cd tidyr
 
 # Linux prerequisites:
 # sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
@@ -255,7 +256,7 @@ npx @tauri-apps/cli dev
 
 ## 9. Non-Goals & Boundaries
 
-By design, Beres intentionally excludes:
+By design, Tidyr intentionally excludes:
 * **Perceptual / Fuzzy Hashing**: Only exact byte duplicates are matched in the MVP to eliminate false positives.
 * **Cloud Sync / Remote Storage**: Everything runs locally with zero external network connectivity.
 * **Persistent Background Watchers**: Operates strictly on-demand to avoid continuous memory and CPU drain.

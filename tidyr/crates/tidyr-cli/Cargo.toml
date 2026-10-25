@@ -1,0 +1,15 @@
+[package]
+name = "tidyr-cli"
+version = "0.1.0"
+edition = "2021"
+description = "Thin CLI over tidyr-core for testing and CI only."
+license = "MIT"
+
+[[bin]]
+name = "tidyr"
+path = "src/main.rs"
+
+[dependencies]
+tidyr-core = { path = "../tidyr-core" }
+anyhow = "1"
+serde_json = "1"

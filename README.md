@@ -1,9 +1,9 @@
-# Beres — rapikan folder, atasi file kembar, tanpa takut kehilangan file
+# Tidyr — rapikan folder, atasi file kembar, tanpa takut kehilangan file
 
-Beres is a safe, friendly, 100% local desktop app (Windows first; macOS/Linux
+Tidyr is a safe, friendly, 100% local desktop app (Windows first; macOS/Linux
 compile best-effort) that helps non-technical users clean messy folders like
 Downloads, Desktop, Pictures, and WhatsApp media. All user-facing text is in
-**Indonesian** (see `ui/src/lib/i18n/id.ts`; mirror it to add English later).
+**Indonesian** (see `tidyr/ui/src/lib/i18n/id.ts`; mirror it to add English later).
 Code, comments, and docs are in English.
 
 > Screenshots: _placeholder — add `docs/screenshot-*.png` after first release._
@@ -39,15 +39,15 @@ scan → duplicates-review flow shape.
 - **Private**: no account, no ads, no telemetry. The only network call is the
   optional update check (see below). Logs contain counts, not file paths.
 
-See [`beres/docs/SAFETY.md`](beres/docs/SAFETY.md) for the invariant → test mapping.
+See [`tidyr/docs/SAFETY.md`](tidyr/docs/SAFETY.md) for the invariant → test mapping.
 
 ## Architecture
 
 ```text
-beres/
-├── crates/beres-core/   # ALL logic, zero UI/Tauri deps (safety→scan→classify→
+tidyr/
+├── crates/tidyr-core/   # ALL logic, zero UI/Tauri deps (safety→scan→classify→
 │                        # dedupe/keeper→plan→journal/quarantine→apply)
-├── crates/beres-cli/    # thin CLI for testing/CI only (`beres scan|apply|undo|…`)
+├── crates/tidyr-cli/    # thin CLI for testing/CI only (`tidyr scan|apply|undo|…`)
 ├── src-tauri/           # thin Tauri commands (glue only, no business logic)
 ├── ui/                  # Svelte + Vite + TypeScript, plain CSS, Indonesian i18n
 └── .github/workflows/   # ci.yml (test/clippy/fmt/build) + release.yml (tag v*)
@@ -60,26 +60,27 @@ see `ci.yml`. Windows/macOS need no extra system deps.
 
 ```sh
 # Desktop app (dev)
-cargo tauri dev
+cd tidyr && cargo tauri dev
 
 # Desktop app (release installer; Windows NSIS per-user, no admin needed)
-cargo tauri build
+cd tidyr && cargo tauri build
 
 # Core + CLI only (no system webview deps needed)
-cargo test -p beres-core -p beres-cli
-cargo clippy -p beres-core -p beres-cli --all-targets -- -D warnings
-cargo fmt -p beres-core -p beres-cli -- --check
+cd tidyr
+cargo test -p tidyr-core -p tidyr-cli
+cargo clippy -p tidyr-core -p tidyr-cli --all-targets -- -D warnings
+cargo fmt -p tidyr-core -p tidyr-cli -- --check
 
 # UI only
-cd ui && npm ci && npm run check && npm run build
+cd tidyr/ui && npm ci && npm run check && npm run build
 
-# CLI smoke test (uses BERES_APP_DATA to avoid touching real data)
-export BERES_APP_DATA=/tmp/beres-smoke
-cargo run -p beres-cli -- scan ~/Downloads --json
+# CLI smoke test (uses TIDYR_APP_DATA to avoid touching real data)
+export TIDYR_APP_DATA=/tmp/tidyr-smoke
+cd tidyr && cargo run -p tidyr-cli -- scan ~/Downloads --json
 ```
 
 Note: `src-tauri` is a workspace member but needs OS webviews to compile, so
-local gates use `-p beres-core -p beres-cli`; CI checks `-p beres` on all OSes.
+local gates use `-p tidyr-core -p tidyr-cli`; CI checks `-p tidyr` on all OSes.
 
 ## Dependencies (justified)
 
@@ -93,15 +94,14 @@ frameworks, no CSS frameworks.
 
 ## Updater key setup (maintainer)
 
-1. Generate a keypair: `cargo tauri signer generate -w ~/.tauri/beres.key`
+1. Generate a keypair: `cargo tauri signer generate -w ~/.tauri/tidyr.key`
    (or `tauri signer generate`). The `.pubkey` output goes into
-   `src-tauri/tauri.conf.json` → `plugins.updater.pubkey`.
+   `tidyr/src-tauri/tauri.conf.json` → `plugins.updater.pubkey`.
 2. Store the private key in GitHub Secrets as `TAURI_SIGNING_PRIVATE_KEY`
    (and password as `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`). Never commit it.
 3. Push tag `v*` → `release.yml` builds the Windows NSIS installer, signs
    updater artifacts, and publishes a GitHub Release with `latest.json`.
-4. Replace `BERES_ORG` in `tauri.conf.json → plugins.updater.endpoints`
-   with the real GitHub org/repo.
+4. The GitHub repository is configured as `baniputrabangsawan/Tidyr`.
 
 The app checks at most once per 24h on startup, only if enabled in Settings;
 a manual "Periksa pembaruan" button is in Settings. The only data sent is the
@@ -131,7 +131,8 @@ action uploads artifacts.
 ## Tests
 
 ```sh
-cargo test -p beres-core            # 41 unit + 3 acceptance + 1 property suite
+cd tidyr
+cargo test -p tidyr-core            # 46 unit + 6 acceptance + 1 property suite
 ```
 
 Acceptance: 5,000-file/500-duplicate fixture — plan summary matches ground
