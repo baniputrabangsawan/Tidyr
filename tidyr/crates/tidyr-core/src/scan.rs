@@ -240,11 +240,11 @@ mod tests {
         assert!(res.unreadable.is_empty());
     }
 
+    #[cfg(unix)]
     #[test]
     fn records_symlinks_without_following() {
         let dir = tempfile::tempdir().unwrap();
         fs::write(dir.path().join("real.txt"), b"data").unwrap();
-        #[cfg(unix)]
         std::os::unix::fs::symlink("real.txt", dir.path().join("link.txt")).unwrap();
         let res = scan_folder(dir.path(), &[], &progress(), &CancelFlag::new());
         assert_eq!(res.files.len(), 1);
