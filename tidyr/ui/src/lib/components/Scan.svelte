@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { listen, type UnlistenFn } from "@tauri-apps/api/event";
-  import { api } from "../api";
+  import { api, isTauri } from "../api";
   import { id } from "../i18n/id";
   import { screen, scanOutcome } from "../store";
 
@@ -10,6 +10,7 @@
   let unlisten: UnlistenFn | null = null;
 
   onMount(async () => {
+    if (!isTauri()) return;
     unlisten = await listen<{ files: number; bytes: number; phase: string }>(
       "tidyr://scan-progress",
       (e) => {

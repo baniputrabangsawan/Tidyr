@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { api, formatBytes } from "./lib/api";
+  import { api, formatBytes, isTauri } from "./lib/api";
   import type { SessionInfo } from "./lib/api";
   import { id } from "./lib/i18n/id";
   import {
@@ -132,6 +132,12 @@
   <h1>{id.appName}</h1>
   <span class="muted">{id.tagline}</span>
 </header>
+
+{#if !isTauri()}
+  <div class="card" role="note" style="margin: 0 0 16px 0; padding: 10px 16px; font-size: 0.9rem; background: var(--surface); border-left: 4px solid var(--accent, #3182ce);">
+    <span>🌐 <strong>Mode Pratinjau Web:</strong> Berjalan di browser biasa. Semua aksi dan data disimulasikan agar Anda dapat menguji seluruh antarmuka (Pilih folder, Rencana, Riwayat, dll).</span>
+  </div>
+{/if}
 
 {#if !$onboarded}
   <main>
