@@ -41,8 +41,7 @@
     "windows": {
       "nsis": {
         "installMode": "currentUser",
-        "languages": ["English"],
-        "license": "../../LICENSE"
+        "languages": ["English"]
       }
     },
     "linux": {
