@@ -1,9 +1,12 @@
 [package]
 name = "tidyr"
-version = "0.1.0"
-edition = "2021"
-description = "Tidyr desktop app (Tauri shell; thin glue over tidyr-core)."
-license = "MIT"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Aplikasi desktop Tidyr: rapikan folder dan atasi file kembar, aman dan 100% lokal"
 
 [lib]
 name = "tidyr_lib"

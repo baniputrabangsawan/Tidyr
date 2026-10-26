@@ -19,6 +19,7 @@
   import Done from "./lib/components/Done.svelte";
   import History from "./lib/components/History.svelte";
   import SettingsView from "./lib/components/SettingsView.svelte";
+  import Logo from "./lib/components/Logo.svelte";
 
   let onboardStep = 0;
   let purgeNotice = "";
@@ -129,6 +130,7 @@
   }}
 />
 <header class="topbar">
+  <Logo size={32} alt="Tidyr" />
   <h1>{id.appName}</h1>
   <span class="muted">{id.tagline}</span>
 </header>

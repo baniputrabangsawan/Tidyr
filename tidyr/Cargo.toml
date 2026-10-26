@@ -6,6 +6,13 @@ members = [
 ]
 resolver = "2"
 
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Bani Putra Bangsawan <baniputrabangsawan0@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/baniputrabangsawan/Tidyr"
+homepage = "https://github.com/baniputrabangsawan/Tidyr"
 # Small binaries: optimize for size in release builds.
 [profile.release]
 opt-level = "s"

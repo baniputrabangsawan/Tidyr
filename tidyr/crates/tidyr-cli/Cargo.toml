@@ -1,9 +1,12 @@
 [package]
 name = "tidyr-cli"
-version = "0.1.0"
-edition = "2021"
-description = "Thin CLI over tidyr-core for testing and CI only."
-license = "MIT"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "CLI Tidyr: antarmuka baris perintah untuk pengujian dan otomasi perapian folder"
 
 [[bin]]
 name = "tidyr"

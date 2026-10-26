@@ -41,6 +41,38 @@ scan → duplicates-review flow shape.
 
 See [`tidyr/docs/SAFETY.md`](tidyr/docs/SAFETY.md) for the invariant → test mapping.
 
+## Download / Unduh
+
+Get the latest official pre-built binaries and installers from [GitHub Releases](https://github.com/baniputrabangsawan/Tidyr/releases/latest).
+
+| Platform | Package Format | Installation | Uninstallation | Auto-Update Support |
+|---|---|---|---|---|
+| **Windows** | `.exe` (NSIS) | Run `tidyr-setup.exe` (installs to `%LOCALAPPDATA%\Programs\Tidyr`, no admin needed) | Windows Settings → Apps → Installed apps → Search "Tidyr" → Uninstall (or run `Uninstall.exe`) | **Yes** (Built-in updater with cryptographic signature verification) |
+| **Windows** | `.msi` | Run `tidyr_x64.msi` | Windows Settings → Apps → Installed apps → Search "Tidyr" → Uninstall | Manual / GPO managed |
+| **Linux** | `.deb` (Debian / Ubuntu / Mint) | `sudo dpkg -i tidyr_*_amd64.deb` or `sudo apt install ./tidyr_*_amd64.deb` | `sudo apt remove tidyr` | **No** (Standard system package management; update by installing newer `.deb`) |
+| **Linux** | `.AppImage` | `chmod +x tidyr_*.AppImage` and run directly | Delete the `.AppImage` binary file | In-place update supported when launched |
+
+### Windows SmartScreen Note
+Because community open-source releases are not signed with a paid commercial EV code-signing certificate, Windows SmartScreen may present an alert: *"Windows protected your PC"*.
+1. Click **"More info"**.
+2. Click **"Run anyway"**.
+
+### Where User Data Lives
+Tidyr stores state, rollback journals, file hash caches, and quarantined duplicates locally:
+- **Windows**: `%LOCALAPPDATA%\id.tidyr.app` (`C:\Users\<User>\AppData\Local\id.tidyr.app`)
+- **Linux**: `~/.local/share/id.tidyr.app`
+- **macOS**: `~/Library/Application Support/id.tidyr.app`
+
+Contents:
+- `journal.db` — Write-ahead SQLite WAL transaction journal for 1-click rollback
+- `quarantine/` & `quarantine.db` — Isolated holding area for duplicates (auto-purged after retention period, default 30 days)
+- `cache.db` — BLAKE3 hash cache for instant re-scanning
+- `settings.json` — User preferences and excluded folders
+
+### How Updates Work
+- **Windows**: Tidyr automatically checks for updates once every 24 hours on startup (if enabled in Settings, or on demand via "Periksa pembaruan"). Updates are downloaded and applied in-place after signature verification.
+- **Linux (`.deb`)**: Package updates are not handled automatically inside the app. Download the updated `.deb` from the releases page and install it with `sudo dpkg -i tidyr_*_amd64.deb`.
+
 ## Architecture
 
 ```text
@@ -139,3 +171,11 @@ Acceptance: 5,000-file/500-duplicate fixture — plan summary matches ground
 truth; apply→undo restores the exact tree (path + hash). Property:
 `prop_apply_undo_is_identity` (20 random trees). Integration tests only use
 tempdirs — never real user folders.
+
+## Lisensi / License
+
+Distributed under the MIT License. See [`LICENSE`](LICENSE) for the full copyright notice:
+```text
+Copyright (c) 2026 Bani Putra Bangsawan
+```
+Third-party dependency licenses and notices are listed in [`THIRD-PARTY-LICENSES.md`](THIRD-PARTY-LICENSES.md).

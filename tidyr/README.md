@@ -3,7 +3,7 @@
 Tidyr is a safe, friendly, 100% local desktop app (Windows first; macOS/Linux
 compile best-effort) that helps non-technical users clean messy folders like
 Downloads, Desktop, Pictures, and WhatsApp media. All user-facing text is in
-**Indonesian** (see `ui/src/lib/i18n/id.ts`; mirror it to add English later).
+**Indonesian** (see `tidyr/ui/src/lib/i18n/id.ts`; mirror it to add English later).
 Code, comments, and docs are in English.
 
 > Screenshots: _placeholder — add `docs/screenshot-*.png` after first release._
@@ -39,7 +39,39 @@ scan → duplicates-review flow shape.
 - **Private**: no account, no ads, no telemetry. The only network call is the
   optional update check (see below). Logs contain counts, not file paths.
 
-See [`docs/SAFETY.md`](docs/SAFETY.md) for the invariant → test mapping.
+See [`tidyr/docs/SAFETY.md`](tidyr/docs/SAFETY.md) for the invariant → test mapping.
+
+## Download / Unduh
+
+Get the latest official pre-built binaries and installers from [GitHub Releases](https://github.com/baniputrabangsawan/Tidyr/releases/latest).
+
+| Platform | Package Format | Installation | Uninstallation | Auto-Update Support |
+|---|---|---|---|---|
+| **Windows** | `.exe` (NSIS) | Run `tidyr-setup.exe` (installs to `%LOCALAPPDATA%\Programs\Tidyr`, no admin needed) | Windows Settings → Apps → Installed apps → Search "Tidyr" → Uninstall (or run `Uninstall.exe`) | **Yes** (Built-in updater with cryptographic signature verification) |
+| **Windows** | `.msi` | Run `tidyr_x64.msi` | Windows Settings → Apps → Installed apps → Search "Tidyr" → Uninstall | Manual / GPO managed |
+| **Linux** | `.deb` (Debian / Ubuntu / Mint) | `sudo dpkg -i tidyr_*_amd64.deb` or `sudo apt install ./tidyr_*_amd64.deb` | `sudo apt remove tidyr` | **No** (Standard system package management; update by installing newer `.deb`) |
+| **Linux** | `.AppImage` | `chmod +x tidyr_*.AppImage` and run directly | Delete the `.AppImage` binary file | In-place update supported when launched |
+
+### Windows SmartScreen Note
+Because community open-source releases are not signed with a paid commercial EV code-signing certificate, Windows SmartScreen may present an alert: *"Windows protected your PC"*.
+1. Click **"More info"**.
+2. Click **"Run anyway"**.
+
+### Where User Data Lives
+Tidyr stores state, rollback journals, file hash caches, and quarantined duplicates locally:
+- **Windows**: `%LOCALAPPDATA%\id.tidyr.app` (`C:\Users\<User>\AppData\Local\id.tidyr.app`)
+- **Linux**: `~/.local/share/id.tidyr.app`
+- **macOS**: `~/Library/Application Support/id.tidyr.app`
+
+Contents:
+- `journal.db` — Write-ahead SQLite WAL transaction journal for 1-click rollback
+- `quarantine/` & `quarantine.db` — Isolated holding area for duplicates (auto-purged after retention period, default 30 days)
+- `cache.db` — BLAKE3 hash cache for instant re-scanning
+- `settings.json` — User preferences and excluded folders
+
+### How Updates Work
+- **Windows**: Tidyr automatically checks for updates once every 24 hours on startup (if enabled in Settings, or on demand via "Periksa pembaruan"). Updates are downloaded and applied in-place after signature verification.
+- **Linux (`.deb`)**: Package updates are not handled automatically inside the app. Download the updated `.deb` from the releases page and install it with `sudo dpkg -i tidyr_*_amd64.deb`.
 
 ## Architecture
 
@@ -60,26 +92,28 @@ see `ci.yml`. Windows/macOS need no extra system deps.
 
 ```sh
 # Desktop app (dev)
-cargo tauri dev
+cd tidyr && cargo tauri dev
 
 # Desktop app (release installer; Windows NSIS per-user, no admin needed)
-cargo tauri build
+cd tidyr && cargo tauri build
 
 # Core + CLI only (no system webview deps needed)
+cd tidyr
 cargo test -p tidyr-core -p tidyr-cli
 cargo clippy -p tidyr-core -p tidyr-cli --all-targets -- -D warnings
 cargo fmt -p tidyr-core -p tidyr-cli -- --check
 
 # UI only
-cd ui && npm ci && npm run check && npm run build
+cd tidyr/ui && npm ci && npm run check && npm run build
 
 # CLI smoke test (uses TIDYR_APP_DATA to avoid touching real data)
 export TIDYR_APP_DATA=/tmp/tidyr-smoke
-cargo run -p tidyr-cli -- scan ~/Downloads --json
+cd tidyr && cargo run -p tidyr-cli -- scan ~/Downloads --json
 ```
 
 Note: `src-tauri` is a workspace member but needs OS webviews to compile, so
 local gates use `-p tidyr-core -p tidyr-cli`; CI checks `-p tidyr` on all OSes.
+
 ## Dependencies (justified)
 
 `walkdir` (traversal), `rayon` (parallel hashing), `blake3` (hashing),
@@ -94,7 +128,7 @@ frameworks, no CSS frameworks.
 
 1. Generate a keypair: `cargo tauri signer generate -w ~/.tauri/tidyr.key`
    (or `tauri signer generate`). The `.pubkey` output goes into
-   `src-tauri/tauri.conf.json` → `plugins.updater.pubkey`.
+   `tidyr/src-tauri/tauri.conf.json` → `plugins.updater.pubkey`.
 2. Store the private key in GitHub Secrets as `TAURI_SIGNING_PRIVATE_KEY`
    (and password as `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`). Never commit it.
 3. Push tag `v*` → `release.yml` builds the Windows NSIS installer, signs
@@ -129,6 +163,7 @@ action uploads artifacts.
 ## Tests
 
 ```sh
+cd tidyr
 cargo test -p tidyr-core            # 46 unit + 6 acceptance + 1 property suite
 ```
 
@@ -136,3 +171,11 @@ Acceptance: 5,000-file/500-duplicate fixture — plan summary matches ground
 truth; apply→undo restores the exact tree (path + hash). Property:
 `prop_apply_undo_is_identity` (20 random trees). Integration tests only use
 tempdirs — never real user folders.
+
+## Lisensi / License
+
+Distributed under the MIT License. See [`LICENSE`](LICENSE) for the full copyright notice:
+```text
+Copyright (c) 2026 Bani Putra Bangsawan
+```
+Third-party dependency licenses and notices are listed in [`THIRD-PARTY-LICENSES.md`](THIRD-PARTY-LICENSES.md).

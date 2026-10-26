@@ -1,6 +1,11 @@
 {
   "name": "tidyr-ui",
   "version": "0.1.0",
+  "license": "MIT",
+  "author": "Bani Putra Bangsawan <baniputrabangsawan0@gmail.com>",
+  "description": "Antarmuka pengguna Tidyr desktop",
+  "repository": "https://github.com/baniputrabangsawan/Tidyr",
+  "homepage": "https://github.com/baniputrabangsawan/Tidyr",
   "private": true,
   "type": "module",
   "scripts": {

@@ -1,9 +1,12 @@
 [package]
 name = "tidyr-core"
-version = "0.1.0"
-edition = "2021"
-description = "Core logic for Tidyr: scan, dedupe, plan, quarantine, undo. No UI/Tauri dependencies."
-license = "MIT"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Logika inti Tidyr: pemindaian, deduplikasi, perencanaan, karantina, dan pemulihan (undo)"
 
 [dependencies]
 walkdir = "2"

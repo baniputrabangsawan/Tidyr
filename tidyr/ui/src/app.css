@@ -11,6 +11,7 @@
   --accent-hover: #276942;
   --warn: #b3541e;
   --danger: #b3261e;
+  --brand-bar: #1d4e30;
   --radius: 12px;
   --radius-sm: 8px;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
@@ -28,6 +29,7 @@
   --accent-hover: #6ece91;
   --warn: #e09a5a;
   --danger: #e07a70;
+  --brand-bar: #24683f;
   --shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
   color-scheme: dark;
 }
@@ -44,6 +46,7 @@
     --accent-hover: #6ece91;
     --warn: #e09a5a;
     --danger: #e07a70;
+    --brand-bar: #24683f;
     --shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
     color-scheme: dark;
   }
@@ -89,6 +92,11 @@ header.topbar h1 {
   font-size: 1.4rem;
   margin: 0;
   letter-spacing: -0.01em;
+}
+
+.topbar-logo {
+  flex-shrink: 0;
+  display: block;
 }
 
 nav.tabs {

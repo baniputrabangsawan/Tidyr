@@ -88,3 +88,49 @@ Pada tab **Pengaturan**, Anda dapat mengonfigurasi:
    * **Nanti**: Menunda pembaruan.
    * **Lewati versi ini**: Mengabaikan versi tersebut hingga rilis berikutnya.
 4. **Tema**: Mendukung mode Sistem, Terang (*Light*), dan Gelap (*Dark*).
+
+---
+
+## 5. Unduh & Instalasi Aplikasi
+
+Unduh berkas instalasi resmi dari halaman rilis GitHub:
+👉 **[Unduh Rilis Resmi Tidyr](https://github.com/baniputrabangsawan/Tidyr/releases/latest)**
+
+### Tabel Format Paket & Panduan Pasang/Copot
+
+| Sistem Operasi | Format Berkas | Cara Pasang (*Install*) | Cara Copot (*Uninstall*) | Dukungan Pembaruan Otomatis |
+|---|---|---|---|---|
+| **Windows** | `.exe` (NSIS) | Jalankan `tidyr-setup.exe` (terpasang di `%LOCALAPPDATA%\Programs\Tidyr`, tanpa perlu hak Administrator) | Pengaturan Windows → Aplikasi → Aplikasi terinstal → Cari "Tidyr" → Copot pemasangan (*Uninstall*) | **Ya** (Pembaruan otomatis bawaan dengan verifikasi tanda tangan digital) |
+| **Windows** | `.msi` | Jalankan `tidyr_x64.msi` | Pengaturan Windows → Aplikasi → Aplikasi terinstal → Cari "Tidyr" → Uninstall | Manual / Dikelola kebijakan grup (GPO) |
+| **Linux** | `.deb` (Debian, Ubuntu, Mint) | `sudo dpkg -i tidyr_*_amd64.deb` atau `sudo apt install ./tidyr_*_amd64.deb` | `sudo apt remove tidyr` | **Tidak** (Dikelola oleh manajer paket sistem; perbarui dengan mengunduh `.deb` versi baru) |
+| **Linux** | `.AppImage` | Berikan izin eksekusi (`chmod +x tidyr_*.AppImage`) lalu jalankan langsung | Hapus berkas `.AppImage` | Pembaruan langsung saat aplikasi dijalankan |
+
+### Penanganan Peringatan Windows SmartScreen
+Karena aplikasi komunitas sumber terbuka ini belum ditandatangani menggunakan sertifikat komersial berbayar (EV Code Signing), Windows SmartScreen mungkin memunculkan layar biru bertuliskan: *"Windows protected your PC"* atau *"Windows melindungi PC Anda"*.
+1. Klik **"More info"** (*Info selengkapnya*).
+2. Klik tombol **"Run anyway"** (*Tetap jalankan*).
+
+### Lokasi Penyimpanan Data Pengguna
+Tidyr menyimpan jurnal transaksi, riwayat sesi, cache hash, dan karantina secara lokal di komputer Anda:
+* **Windows**: `%LOCALAPPDATA%\id.tidyr.app` (`C:\Users\<NamaUser>\AppData\Local\id.tidyr.app`)
+* **Linux**: `~/.local/share/id.tidyr.app`
+* **macOS**: `~/Library/Application Support/id.tidyr.app`
+
+Isi folder data:
+* `journal.db` — Jurnal transaksi SQLite WAL untuk fitur **Urungkan 1-Klik**.
+* `quarantine/` & `quarantine.db` — Folder isolasi berkas duplikat yang aman.
+* `cache.db` — Cache hash BLAKE3 untuk mempercepat pemindaian ulang.
+* `settings.json` — Konfigurasi preferensi dan daftar folder pengecualian.
+
+### Catatan Transparan Pembaruan Aplikasi
+* **Windows**: Pembaruan otomatis memeriksa versi baru secara berkala (sekali per 24 jam) saat aplikasi dibuka, memvalidasi tanda tangan kriptografi rilis, dan mengunduh pembaruan di tempat.
+* **Linux (`.deb`)**: Aplikasi tidak melakukan auto-update di latar belakang karena paket Debian wajib dikelola oleh manajer paket sistem (`apt`/`dpkg`). Untuk memperbarui versi, unduh berkas `.deb` rilis terbaru dari GitHub Releases dan pasang kembali.
+
+---
+
+## 6. Lisensi
+
+Aplikasi Tidyr didistribusikan di bawah lisensi resmi **MIT License**.
+Hak Cipta: **Copyright (c) 2026 Bani Putra Bangsawan**.
+
+Rincian lisensi dependensi sumber terbuka pihak ketiga dapat dilihat pada berkas [`THIRD-PARTY-LICENSES.md`](../../THIRD-PARTY-LICENSES.md).

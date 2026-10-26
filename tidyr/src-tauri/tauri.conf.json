@@ -27,11 +27,27 @@
     "active": true,
     "targets": "all",
     "category": "Utility",
+    "copyright": "Copyright (c) 2026 Bani Putra Bangsawan",
+    "license": "MIT",
+    "licenseFile": "../../LICENSE",
     "shortDescription": "Rapikan folder dan atasi file kembar, aman dan lokal",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
     "windows": {
       "nsis": {
         "installMode": "currentUser",
-        "languages": ["English"]
+        "languages": ["English"],
+        "license": "../../LICENSE"
+      }
+    },
+    "linux": {
+      "deb": {
+        "depends": []
       }
     },
     "createUpdaterArtifacts": true
@@ -41,7 +57,7 @@
       "active": true,
       "endpoints": ["https://github.com/baniputrabangsawan/Tidyr/releases/latest/download/latest.json"],
       "dialog": false,
-      "pubkey": "REPLACE_WITH_UPDATER_PUBLIC_KEY"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDJBQTRFNDcyQzBFQzEzNkMKUldSc0UrekFjdVNrS3N1RVBkeWNDaGJBYWdySTdvbS9mRldoZFJ2Ukk3UTI3MENCU3RGam0weWQK"
     }
   }
 }
