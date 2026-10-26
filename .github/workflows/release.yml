@@ -21,7 +21,10 @@ jobs:
           cache: npm
           cache-dependency-path: tidyr/ui/package-lock.json
       - uses: Swatinem/rust-cache@v2
-      - run: npm ci
+        with:
+          workspaces: tidyr
+      - name: build ui
+        run: npm ci && npm run build
         working-directory: tidyr/ui
       - name: build + publish release (tag push)
         if: startsWith(github.ref, 'refs/tags/v')
@@ -73,12 +76,19 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: tidyr/ui/package-lock.json
+      - name: install targets for universal apple darwin
+        if: runner.os == 'macOS'
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tidyr
       - name: system deps (linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libdbus-1-dev pkg-config
-      - run: npm ci
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libdbus-1-dev pkg-config
+      - name: build ui
+        run: npm ci && npm run build
         working-directory: tidyr/ui
       - name: build + publish release (tag push)
         if: startsWith(github.ref, 'refs/tags/v')
